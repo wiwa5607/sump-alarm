@@ -555,18 +555,47 @@ int sa_strcmp(char *s1, const char *s2)
 	}
 	return 0;
 }
+// write int to file
+int write_count_to_file(const char* filename, int Data){
+    FILE * file = fopen(filename, "w");
+    fprintf(file, "%d\n", Data);
+    fclose(file);
+    return 0;
+}
 
+// store an integer in a file
+int read_count_from_file(const char* filename){
+    int Data[1];
+    FILE * file = fopen(filename, "r"); // open file
+    fscanf(file, "%d\n", &Data[0]); //store info in Data array
+    fclose(file);
+    int Nx; // store data in respective variables
+    Nx = Data[0];
+    // printf("Value of Nx is %d\n", Nx); // Print values to check
+    return Nx;
+}
 // Set environment variables in advance of running an action script
 void SetEnvironment(struct FloatSwitch s,struct ConfigData cd)
 {
 	char envstr[1000];
 	int timeleft;
-
-	snprintf(envstr,999,"%d",cd.freq);
+    // if switch hasn't been triggered before, read from file
+	if (cd.switchlist[0].LastOn!=0) {
+        snprintf(envstr,999, "%d", read_count_from_file("SAFREQ.txt"));
+    } else{
+	    snprintf(envstr,999,"%d",cd.freq);
+    }
 	setenv("SAFREQ",envstr,1);
+    write_count_to_file("SAFREQ.txt", atoi(envstr));
 
-	snprintf(envstr,999,"%dm %ds",cd.freq/60,cd.freq%60);
+    // if switch hasn't been triggered before, read from file
+	if (cd.switchlist[0].LastOn!=0) {
+        snprintf(envstr,999, "%d", read_count_from_file("SAFREQF.txt"));
+    } else{
+	    snprintf(envstr,999,"%dm %ds",cd.freq/60,cd.freq%60);
+    }
 	setenv("SAFREQF",envstr,1);
+    write_count_to_file("SAFREQF.txt", atoi(envstr));
 
 	cd.vol=((s.level/10.0)*(3.14159265*(cd.sumpdiameter/20.0)*(cd.sumpdiameter/20.0)))/1000.0;
 	snprintf(envstr,999,"%d",cd.vol);
