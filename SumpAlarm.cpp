@@ -565,14 +565,19 @@ int write_count_to_file(const char* filename, int Data){
 
 // store an integer in a file
 int read_count_from_file(const char* filename){
-    int Data[1];
-    FILE * file = fopen(filename, "r"); // open file
-    fscanf(file, "%d\n", &Data[0]); //store info in Data array
-    fclose(file);
-    int Nx; // store data in respective variables
-    Nx = Data[0];
-    // printf("Value of Nx is %d\n", Nx); // Print values to check
-    return Nx;
+	if (access(filename, F_OK) == 0) {
+	    // file exists    
+		int Data[1];
+	    FILE * file = fopen(filename, "r"); // open file
+	    fscanf(file, "%d\n", &Data[0]); //store info in Data array
+	    fclose(file);
+	    int Nx; // store data in respective variables
+	    Nx = Data[0];
+	    // printf("Value of Nx is %d\n", Nx); // Print values to check
+	    return Nx;
+	}
+	return 0;
+
 }
 // Set environment variables in advance of running an action script
 void SetEnvironment(struct FloatSwitch s,struct ConfigData cd)
